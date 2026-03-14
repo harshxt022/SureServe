@@ -11,11 +11,12 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public')));
+// Serve React static files in production
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 // Routes
-app.use('/', indexRoutes);
-app.use('/services', servicesRoutes);
+app.use('/api', indexRoutes);
+app.use('/api/services', servicesRoutes);
 
 const { initialDatabaseSetup } = require('./config/initDb');
 
@@ -32,4 +33,10 @@ db.query('SELECT 1')
 // Start Server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+});
+
+// React Catch-all Route for Client-Side Routing
+// Should be placed after all API and static routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
