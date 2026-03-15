@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ const LoginPage = () => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('role', role);
         setTimeout(() => {
-          navigate('/dashboard'); // placeholder for now
+          navigate('/dashboard');
         }, 1500);
       } else {
         setIsError(true);
@@ -40,100 +40,84 @@ const LoginPage = () => {
       setMessage('Network error. Please try again.');
     }
   };
-  return (
-    <>
 
-      {/*  Minimal Nav  */}
-      <nav className="w-full p-4 flex justify-between items-center absolute top-0 left-0 right-0 z-10">
-        <a href="/" className="flex items-center gap-2 group cursor-pointer text-gray-900 dark:text-white px-4">
-          <div
-            className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center text-white shadow-lg group-hover:rotate-12 transition-transform duration-300">
-            <i className="fas fa-home text-lg"></i>
+  return (
+    <div className="min-h-screen bg-[#FAFAF8] flex flex-col relative overflow-hidden">
+      {/* Floating decorative shapes */}
+      <div className="absolute top-[10%] right-[8%] w-32 h-32 border border-[#E8E8E4] rounded-3xl rotate-12 float-shape opacity-40"></div>
+      <div className="absolute bottom-[15%] left-[5%] w-24 h-24 border border-[#E8E8E4] rounded-full float-shape opacity-30" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute top-[55%] right-[15%] w-16 h-16 bg-[#4F46E5]/5 rounded-2xl rotate-45 float-shape opacity-60" style={{ animationDelay: '4s' }}></div>
+      <div className="absolute top-[25%] left-[10%] w-20 h-20 border border-[#4F46E5]/10 rounded-full float-shape opacity-40" style={{ animationDelay: '1s' }}></div>
+
+      {/* Nav */}
+      <nav className="w-full px-6 lg:px-8 py-6 flex justify-between items-center relative z-10">
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-9 h-9 rounded-lg bg-[#4F46E5] flex items-center justify-center text-white text-sm font-bold group-hover:rounded-xl transition-all duration-300">
+            S
           </div>
-          <span className="text-2xl font-bold font-heading tracking-tight">SureServe</span>
-        </a>
-        <button onClick={() => { /* toggleDarkMode() */ }}
-          className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors px-4"
-          aria-label="Toggle Dark Mode">
-          <i className="theme-toggle-icon fas fa-moon text-xl"></i>
-        </button>
+          <span className="text-xl font-bold font-heading tracking-tight text-[#1A1A1A]">SureServe</span>
+        </Link>
       </nav>
 
-      {/*  Login Form  */}
-      <main className="flex-grow flex items-center justify-center p-4 pt-24 relative overflow-hidden">
-        {/*  Decorative  */}
-        <div
-          className="absolute -top-[10%] -right-[10%] w-[400px] h-[400px] rounded-full bg-blue-200/40 dark:bg-blue-900/20 blur-[80px] -z-10">
-        </div>
-        <div
-          className="absolute bottom-[10%] -left-[10%] w-[400px] h-[400px] rounded-full bg-purple-200/40 dark:bg-purple-900/20 blur-[80px] -z-10">
-        </div>
-
-        <div
-          className="max-w-md w-full bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl border border-gray-100 dark:border-gray-700 relative z-10">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold font-heading text-gray-900 dark:text-white mb-2">Welcome Back</h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">Enter your credentials to access your account</p>
+      {/* Main */}
+      <main className="flex-grow flex items-center justify-center px-6 relative z-10">
+        <div className="max-w-md w-full">
+          <div className="text-center mb-10">
+            <h1 className="text-4xl font-bold font-heading text-[#1A1A1A] tracking-tight mb-3">Welcome back</h1>
+            <p className="text-[#6B6B6B]">Enter your credentials to continue</p>
           </div>
 
-          <form id="loginForm" className="space-y-5" onSubmit={handleLogin}>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">I am a</label>
-              <select id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white">
-                <option value="user">Customer</option>
-                <option value="provider">Service Provider</option>
-              </select>
-            </div>
+          <div className="bg-white rounded-3xl p-8 border border-[#E8E8E4] shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+            <form id="loginForm" className="space-y-5" onSubmit={handleLogin}>
+              <div>
+                <label className="block text-sm font-medium text-[#1A1A1A] mb-2">I am a</label>
+                <select id="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-[#FAFAF8] border border-[#E8E8E4] focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent outline-none transition-all text-[#1A1A1A] text-sm">
+                  <option value="user">Customer</option>
+                  <option value="provider">Service Provider</option>
+                </select>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
-              <div className="relative">
-                <i className="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <div>
+                <label className="block text-sm font-medium text-[#1A1A1A] mb-2">Email</label>
                 <input type="email" id="email" placeholder="you@example.com" required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white placeholder-gray-400" />
+                  className="w-full px-4 py-3 rounded-xl bg-[#FAFAF8] border border-[#E8E8E4] focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent outline-none transition-all text-[#1A1A1A] text-sm placeholder-[#6B6B6B]/50" />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
-              <div className="relative">
-                <i className="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <div>
+                <label className="block text-sm font-medium text-[#1A1A1A] mb-2">Password</label>
                 <input type="password" id="password" placeholder="••••••••" required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white placeholder-gray-400" />
+                  className="w-full px-4 py-3 rounded-xl bg-[#FAFAF8] border border-[#E8E8E4] focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent outline-none transition-all text-[#1A1A1A] text-sm placeholder-[#6B6B6B]/50" />
               </div>
-            </div>
 
-            <button type="submit"
-              className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-xl transform hover:-translate-y-0.5">
-              Sign In
-            </button>
-          </form>
+              <button type="submit"
+                className="w-full py-3.5 rounded-xl font-semibold text-white bg-[#4F46E5] hover:bg-[#4338CA] transition-colors text-sm shadow-sm">
+                Sign In
+              </button>
+            </form>
 
-          {message && (
-            <p className={`mt-4 text-center text-sm font-medium ${isError ? 'text-red-500' : 'text-green-500'}`}>
-              {message}
-            </p>
-          )}
+            {message && (
+              <p className={`mt-5 text-center text-sm font-medium ${isError ? 'text-red-500' : 'text-green-600'}`}>
+                {message}
+              </p>
+            )}
+          </div>
 
-          <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-            Don't have an account? <br className="sm:hidden" />
-            <a href="/register-user" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">User
-              Signup</a> or
-            <a href="/register-provider"
-              className="text-purple-600 dark:text-purple-400 hover:underline font-semibold">Provider Signup</a>
+          <p className="mt-6 text-center text-sm text-[#6B6B6B]">
+            Don't have an account?{' '}
+            <Link to="/register-user" className="text-[#4F46E5] hover:underline font-semibold">Sign Up</Link>
+            {' '}or{' '}
+            <Link to="/register-provider" className="text-[#4F46E5] hover:underline font-semibold">Join as Provider</Link>
           </p>
         </div>
       </main>
-
-
-    </>
+    </div>
   );
 };
 

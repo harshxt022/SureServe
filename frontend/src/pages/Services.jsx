@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ExploreMoreModal from '../components/ExploreMoreModal';
 
@@ -16,45 +16,64 @@ const Services = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleServiceClick = (serviceName) => {
-        // Navigate to /providers?service=name
-        // URL encode the service name to handle spaces properly
         navigate(`/providers?service=${encodeURIComponent(serviceName)}`);
     };
 
-    return (
-        <div style={styles.container}>
-            <h1 style={styles.title}>Our Services</h1>
-            <p style={styles.subtitle}>Choose a service below to find the best providers for your needs.</p>
+    // Scroll reveal
+    useEffect(() => {
+        const els = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry, i) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.15 }
+        );
+        els.forEach((el) => observer.observe(el));
+        return () => observer.disconnect();
+    }, []);
 
-            <div style={styles.grid}>
+    return (
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+            {/* Header */}
+            <div className="relative mb-16 reveal">
+                <span className="section-number absolute -top-8 -left-4 select-none">01</span>
+                <div className="relative z-10">
+                    <h1 className="text-4xl md:text-5xl font-bold font-heading text-[#1A1A1A] tracking-tight mb-4">
+                        Our Services
+                    </h1>
+                    <p className="text-[#6B6B6B] text-lg max-w-md">
+                        Choose a service to find the best providers for your needs.
+                    </p>
+                </div>
+            </div>
+
+            {/* Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 reveal">
                 {mockServices.map((service) => (
                     <div
                         key={service.id}
-                        style={styles.card}
+                        className="card-accent hover-lift bg-white rounded-3xl p-8 border border-[#E8E8E4] cursor-pointer group transition-shadow hover:shadow-[0_16px_48px_rgba(0,0,0,0.06)]"
                         onClick={() => handleServiceClick(service.name)}
-                        onMouseOver={(e) => {
-                            e.currentTarget.style.transform = styles.cardHover.transform;
-                            e.currentTarget.style.boxShadow = styles.cardHover.boxShadow;
-                            e.currentTarget.style.borderColor = styles.cardHover.borderColor;
-                        }}
-                        onMouseOut={(e) => {
-                            e.currentTarget.style.transform = 'none';
-                            e.currentTarget.style.boxShadow = styles.card.boxShadow;
-                            e.currentTarget.style.borderColor = styles.card.borderColor;
-                        }}
                     >
-                        <div style={styles.icon}>{service.icon}</div>
-                        <h3 style={styles.serviceName}>{service.name}</h3>
+                        <span className="text-4xl block mb-5">{service.icon}</span>
+                        <h3 className="text-xl font-bold font-heading text-[#1A1A1A] mb-2">{service.name}</h3>
+                        <span className="text-[#4F46E5] text-sm font-semibold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            View Providers <i className="fas fa-arrow-right text-xs"></i>
+                        </span>
                     </div>
                 ))}
             </div>
 
-            <div style={styles.exploreContainer}>
+            {/* Explore more */}
+            <div className="text-center mt-14 reveal">
                 <button
-                    style={styles.exploreBtn}
                     onClick={() => setIsModalOpen(true)}
-                    onMouseOver={(e) => e.target.style.backgroundColor = styles.exploreBtnHover.backgroundColor}
-                    onMouseOut={(e) => e.target.style.backgroundColor = styles.exploreBtn.backgroundColor}
+                    className="magnetic-btn bg-[#1A1A1A] hover:bg-[#2D2D2D] text-white px-8 py-4 rounded-full font-semibold text-sm transition-colors shadow-md"
                 >
                     Explore More Services
                 </button>
@@ -63,78 +82,6 @@ const Services = () => {
             <ExploreMoreModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </div>
     );
-};
-
-const styles = {
-    container: {
-        padding: '2rem',
-        maxWidth: '1200px',
-        margin: '0 auto',
-        fontFamily: 'Inter, Roboto, sans-serif',
-    },
-    title: {
-        textAlign: 'center',
-        marginBottom: '0.5rem',
-        color: '#1f2937',
-        fontSize: '2.5rem',
-        fontWeight: 'bold',
-    },
-    subtitle: {
-        textAlign: 'center',
-        marginBottom: '3rem',
-        color: '#6b7280',
-        fontSize: '1.1rem',
-    },
-    grid: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-        gap: '2rem',
-    },
-    card: {
-        backgroundColor: '#ffffff',
-        border: '1px solid #e5e7eb',
-        borderRadius: '12px',
-        padding: '2.5rem 1.5rem',
-        textAlign: 'center',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-    },
-    cardHover: {
-        transform: 'translateY(-8px)',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        borderColor: '#3b82f6', // subtle blue border on hover
-    },
-    icon: {
-        fontSize: '3.5rem',
-        marginBottom: '1.5rem',
-        display: 'inline-block',
-    },
-    serviceName: {
-        margin: 0,
-        color: '#111827',
-        fontSize: '1.25rem',
-        fontWeight: '600',
-    },
-    exploreContainer: {
-        marginTop: '3.5rem',
-        textAlign: 'center',
-    },
-    exploreBtn: {
-        backgroundColor: '#1f2937',
-        color: '#ffffff',
-        border: 'none',
-        padding: '1rem 2.5rem',
-        borderRadius: '8px',
-        fontSize: '1.1rem',
-        fontWeight: 'bold',
-        cursor: 'pointer',
-        transition: 'background-color 0.3s ease',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-    },
-    exploreBtnHover: {
-        backgroundColor: '#111827',
-    }
 };
 
 export default Services;

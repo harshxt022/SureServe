@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const RegisterProviderPage = () => {
   const navigate = useNavigate();
@@ -47,142 +47,113 @@ const RegisterProviderPage = () => {
       setMessage('Network error. Please try again.');
     }
   };
-  return (
-    <>
 
-      {/*  Minimal Nav  */}
-      <nav className="w-full p-4 flex justify-between items-center absolute top-0 left-0 right-0 z-10">
-        <a href="/" className="flex items-center gap-2 group cursor-pointer text-gray-900 dark:text-white px-4">
-          <div
-            className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center text-white shadow-lg group-hover:rotate-12 transition-transform duration-300">
-            <i className="fas fa-home text-lg"></i>
+  return (
+    <div className="min-h-screen bg-[#FAFAF8] flex flex-col relative overflow-hidden">
+      {/* Floating decorative shapes */}
+      <div className="absolute top-[12%] right-[5%] w-36 h-36 border border-[#E8E8E4] rounded-3xl rotate-12 float-shape opacity-35"></div>
+      <div className="absolute bottom-[8%] left-[4%] w-24 h-24 bg-[#4F46E5]/5 rounded-full float-shape opacity-40" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute top-[50%] right-[10%] w-16 h-16 border border-[#4F46E5]/10 rounded-2xl -rotate-12 float-shape opacity-50" style={{ animationDelay: '3.5s' }}></div>
+      <div className="absolute top-[30%] left-[8%] w-20 h-20 border border-[#E8E8E4] rounded-full float-shape opacity-25" style={{ animationDelay: '1s' }}></div>
+
+      {/* Nav */}
+      <nav className="w-full px-6 lg:px-8 py-6 flex justify-between items-center relative z-10">
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-9 h-9 rounded-lg bg-[#4F46E5] flex items-center justify-center text-white text-sm font-bold group-hover:rounded-xl transition-all duration-300">
+            S
           </div>
-          <span className="text-2xl font-bold font-heading tracking-tight">SureServe</span>
-        </a>
-        <button onClick={() => { /* toggleDarkMode() */ }}
-          className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors px-4"
-          aria-label="Toggle Dark Mode">
-          <i className="theme-toggle-icon fas fa-moon text-xl"></i>
-        </button>
+          <span className="text-xl font-bold font-heading tracking-tight text-[#1A1A1A]">SureServe</span>
+        </Link>
       </nav>
 
-      {/*  Register Form  */}
-      <main className="flex-grow flex items-center justify-center p-4 pt-24 pb-12 relative overflow-hidden">
-        {/*  Decorative  */}
-        <div
-          className="absolute -top-[10%] content-center -right-[10%] w-[400px] h-[400px] rounded-full bg-purple-200/40 dark:bg-purple-900/20 blur-[80px] -z-10">
-        </div>
-        <div
-          className="absolute bottom-[10%] -left-[10%] w-[400px] h-[400px] rounded-full bg-pink-200/40 dark:bg-pink-900/20 blur-[80px] -z-10">
-        </div>
-
-        <div
-          className="max-w-2xl w-full bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl border border-gray-100 dark:border-gray-700 relative z-10">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold font-heading text-gray-900 dark:text-white mb-2">Join as a Professional</h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">Grow your business and connect with customers locally.</p>
+      {/* Main */}
+      <main className="flex-grow flex items-center justify-center px-6 py-8 relative z-10">
+        <div className="max-w-2xl w-full">
+          <div className="text-center mb-10">
+            <h1 className="text-4xl font-bold font-heading text-[#1A1A1A] tracking-tight mb-3">Join as a Professional</h1>
+            <p className="text-[#6B6B6B]">Grow your business and connect with customers locally</p>
           </div>
 
-          <form id="registerForm" className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleRegister}>
-
-            {/*  Column 1: Personal Info  */}
-            <div className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
-                <div className="relative">
-                  <i className="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          <div className="bg-white rounded-3xl p-8 border border-[#E8E8E4] shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+            <form id="registerForm" className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleRegister}>
+              {/* Column 1 */}
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-[#1A1A1A] mb-2">Full Name</label>
                   <input type="text" id="name" placeholder="John Doe" required
                     value={formData.name} onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-purple-500 outline-none transition-all dark:text-white placeholder-gray-400" />
+                    className="w-full px-4 py-3 rounded-xl bg-[#FAFAF8] border border-[#E8E8E4] focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent outline-none transition-all text-[#1A1A1A] text-sm placeholder-[#6B6B6B]/50" />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
-                <div className="relative">
-                  <i className="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <div>
+                  <label className="block text-sm font-medium text-[#1A1A1A] mb-2">Email</label>
                   <input type="email" id="email" placeholder="you@example.com" required
                     value={formData.email} onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-purple-500 outline-none transition-all dark:text-white placeholder-gray-400" />
+                    className="w-full px-4 py-3 rounded-xl bg-[#FAFAF8] border border-[#E8E8E4] focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent outline-none transition-all text-[#1A1A1A] text-sm placeholder-[#6B6B6B]/50" />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
-                <div className="relative">
-                  <i className="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <div>
+                  <label className="block text-sm font-medium text-[#1A1A1A] mb-2">Password</label>
                   <input type="password" id="password" placeholder="••••••••" required
                     value={formData.password} onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-purple-500 outline-none transition-all dark:text-white placeholder-gray-400" />
+                    className="w-full px-4 py-3 rounded-xl bg-[#FAFAF8] border border-[#E8E8E4] focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent outline-none transition-all text-[#1A1A1A] text-sm placeholder-[#6B6B6B]/50" />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
-                <div className="relative">
-                  <i className="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <div>
+                  <label className="block text-sm font-medium text-[#1A1A1A] mb-2">Phone</label>
                   <input type="text" id="phone" placeholder="+1 (555) 000-0000" required
                     value={formData.phone} onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-purple-500 outline-none transition-all dark:text-white placeholder-gray-400" />
+                    className="w-full px-4 py-3 rounded-xl bg-[#FAFAF8] border border-[#E8E8E4] focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent outline-none transition-all text-[#1A1A1A] text-sm placeholder-[#6B6B6B]/50" />
                 </div>
               </div>
-            </div>
 
-            {/*  Column 2: Professional Details  */}
-            <div className="space-y-5">
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Years of Experience</label>
-                <div className="relative">
-                  <i className="fas fa-briefcase absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              {/* Column 2 */}
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-[#1A1A1A] mb-2">Years of Experience</label>
                   <input type="number" id="experience_years" placeholder="0" min="0" required
                     value={formData.experience_years} onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-purple-500 outline-none transition-all dark:text-white placeholder-gray-400" />
+                    className="w-full px-4 py-3 rounded-xl bg-[#FAFAF8] border border-[#E8E8E4] focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent outline-none transition-all text-[#1A1A1A] text-sm placeholder-[#6B6B6B]/50" />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Main Profession</label>
-                <div className="relative">
-                  <i className="fas fa-tools absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <div>
+                  <label className="block text-sm font-medium text-[#1A1A1A] mb-2">Main Profession</label>
                   <input type="text" id="main_profession" placeholder="e.g., Plumber, Electrician" required
                     value={formData.main_profession} onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-purple-500 outline-none transition-all dark:text-white placeholder-gray-400" />
+                    className="w-full px-4 py-3 rounded-xl bg-[#FAFAF8] border border-[#E8E8E4] focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent outline-none transition-all text-[#1A1A1A] text-sm placeholder-[#6B6B6B]/50" />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#1A1A1A] mb-2">Short Bio</label>
+                  <textarea id="bio" placeholder="Describe your skills and services..." rows="5"
+                    value={formData.bio} onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-xl bg-[#FAFAF8] border border-[#E8E8E4] focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent outline-none transition-all text-[#1A1A1A] text-sm placeholder-[#6B6B6B]/50 resize-none"></textarea>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Short Bio</label>
-                <textarea id="bio" placeholder="Describe your skills and services..." rows="4"
-                  value={formData.bio} onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-purple-500 outline-none transition-all dark:text-white placeholder-gray-400"></textarea>
-              </div>
-            </div>
+              {/* Submit row */}
+              <div className="md:col-span-2 space-y-4 mt-2">
+                <button type="submit"
+                  className="w-full py-4 rounded-xl font-semibold text-white bg-[#4F46E5] hover:bg-[#4338CA] transition-colors text-sm shadow-sm">
+                  Submit Application
+                </button>
 
-            <div className="md:col-span-2 mt-4 space-y-4">
-              <button type="submit"
-                className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-xl transform hover:-translate-y-0.5">
-                Submit Application
-              </button>
+                {message && (
+                  <p className={`text-center text-sm font-medium ${isError ? 'text-red-500' : 'text-green-600'}`}>
+                    {message}
+                  </p>
+                )}
 
-              {message && (
-                <p className={`text-center text-sm font-medium ${isError ? 'text-red-500' : 'text-green-500'}`}>
-                  {message}
+                <p className="text-center text-sm text-[#6B6B6B]">
+                  Already have an account?{' '}
+                  <Link to="/login" className="text-[#4F46E5] hover:underline font-semibold">Log In</Link>
                 </p>
-              )}
-
-              <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-                Already have an account? <a href="/login"
-                  className="text-purple-600 dark:text-purple-400 hover:underline font-semibold">Log In</a>
-              </p>
-            </div>
-          </form>
-
+              </div>
+            </form>
+          </div>
         </div>
       </main>
-
-
-    </>
+    </div>
   );
 };
 

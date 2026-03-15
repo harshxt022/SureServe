@@ -1,67 +1,30 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // Using react-router-dom for placeholder navigation
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
     return (
-        <nav className="navbar" style={styles.navbar}>
-            <div className="navbar-brand">
-                <Link to="/" style={styles.brand}>SureServe</Link>
+        <nav className="sticky top-0 z-50 bg-[#FAFAF8]/90 backdrop-blur-md border-b border-[#E8E8E4]">
+            <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                <div className="flex justify-between items-center h-16">
+                    <Link to="/" className="flex items-center gap-3 group">
+                        <div className="w-8 h-8 rounded-lg bg-[#4F46E5] flex items-center justify-center text-white text-xs font-bold group-hover:rounded-xl transition-all duration-300">
+                            S
+                        </div>
+                        <span className="text-lg font-bold font-heading tracking-tight text-[#1A1A1A]">SureServe</span>
+                    </Link>
+
+                    <div className="flex items-center gap-6">
+                        <Link to="/" className="text-sm font-medium text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors">Home</Link>
+                        <Link to="/services" className="text-sm font-medium text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors">Services</Link>
+                        <Link to="/login" className="text-sm font-medium text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors">Login</Link>
+                        <Link to="/register-user" className="bg-[#4F46E5] hover:bg-[#4338CA] text-white text-sm font-semibold px-5 py-2 rounded-full transition-colors">
+                            Sign Up
+                        </Link>
+                    </div>
+                </div>
             </div>
-            <ul className="navbar-nav" style={styles.navLinks}>
-                <li><Link to="/" style={styles.link}>Home</Link></li>
-                <li><Link to="/services" style={styles.link}>Services</Link></li>
-                <li><Link to="/dashboard" style={styles.link}>Dashboard</Link></li>
-                <li><Link to="/login" style={styles.link}>Login</Link></li>
-                <li>
-                    <button
-                        onClick={() => console.log('Logout clicked - Backend not connected')}
-                        style={styles.logoutButton}
-                    >
-                        Logout
-                    </button>
-                </li>
-            </ul>
         </nav>
     );
-};
-
-// Basic inline styles to structure the Navbar placeholders
-const styles = {
-    navbar: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '1rem 2rem',
-        backgroundColor: '#333',
-        color: '#fff',
-    },
-    brand: {
-        color: '#fff',
-        textDecoration: 'none',
-        fontSize: '1.5rem',
-        fontWeight: 'bold',
-    },
-    navLinks: {
-        listStyleType: 'none',
-        display: 'flex',
-        gap: '1.5rem',
-        margin: 0,
-        padding: 0,
-        alignItems: 'center',
-    },
-    link: {
-        color: '#ddd',
-        textDecoration: 'none',
-        fontSize: '1rem',
-    },
-    logoutButton: {
-        backgroundColor: 'transparent',
-        border: '1px solid #ddd',
-        color: '#ddd',
-        padding: '0.5rem 1rem',
-        cursor: 'pointer',
-        borderRadius: '4px',
-    }
 };
 
 export default Navbar;

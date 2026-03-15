@@ -13,13 +13,31 @@ const CategoryPage = () => {
         setCategory(found);
     }, [categoryId]);
 
+    // Scroll reveal
+    useEffect(() => {
+        const els = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry, i) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.15 }
+        );
+        els.forEach((el) => observer.observe(el));
+        return () => observer.disconnect();
+    }, [category]);
+
     if (!category) {
         return (
-            <div className="flex-grow flex items-center justify-center p-4 pt-24 min-h-[60vh]">
+            <div className="flex-grow flex items-center justify-center p-6 min-h-[60vh]">
                 <div className="text-center">
-                    <div className="text-6xl text-gray-300 dark:text-gray-700 mb-4"><i className="fas fa-search-minus"></i></div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Category Not Found</h2>
-                    <p className="text-gray-500 dark:text-gray-400">The service category you are looking for does not exist.</p>
+                    <div className="text-6xl text-[#E8E8E4] mb-4">🔍</div>
+                    <h2 className="text-2xl font-bold font-heading text-[#1A1A1A] mb-2">Category Not Found</h2>
+                    <p className="text-[#6B6B6B]">The service category you are looking for does not exist.</p>
                 </div>
             </div>
         );
@@ -30,40 +48,30 @@ const CategoryPage = () => {
     };
 
     return (
-        <main className="flex-grow pt-24 pb-24 relative overflow-hidden">
-            {/* Background Decorative Blobs */}
-            <div className="absolute top-0 inset-x-0 h-[500px] overflow-hidden -z-10 pointer-events-none">
-                <div className="absolute -top-[20%] -right-[10%] w-[600px] h-[600px] rounded-full bg-blue-200/40 dark:bg-blue-900/20 blur-[100px] mix-blend-multiply opacity-70"></div>
-                <div className="absolute top-[10%] -left-[10%] w-[500px] h-[500px] rounded-full bg-purple-200/40 dark:bg-purple-900/20 blur-[100px] mix-blend-multiply opacity-70"></div>
-            </div>
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                {/* Header Area */}
-                <div className="text-center mb-16 animate-fade-up">
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white dark:bg-gray-800 shadow-md border border-gray-100 dark:border-gray-700 text-4xl mb-6 relative">
-                        <span className="relative z-10">{category.icon}</span>
-                        <div className="absolute inset-0 bg-blue-500/10 rounded-3xl blur-md"></div>
-                    </div>
-
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-tight mb-4 font-heading">
-                        {category.title} <span className="text-gradient">Services</span>
+        <main className="max-w-7xl mx-auto px-6 lg:px-8 py-16 relative">
+            {/* Header with section number */}
+            <div className="relative mb-16 reveal">
+                <span className="section-number absolute -top-8 -left-4 select-none">{category.icon}</span>
+                <div className="relative z-10">
+                    <h1 className="text-4xl md:text-5xl font-bold font-heading text-[#1A1A1A] tracking-tight mb-4">
+                        {category.title} <span className="text-[#4F46E5]">Services</span>
                     </h1>
-
-                    <p className="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+                    <p className="text-[#6B6B6B] text-lg max-w-lg">
                         {category.description}
                     </p>
                 </div>
+            </div>
 
-                {/* Services Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 animate-fade-up" style={{ animationDelay: '0.1s' }}>
-                    {category.services.map((service) => (
-                        <ServiceCard
-                            key={service.id}
-                            service={service}
-                            onAction={() => handleViewProviders(service.name)}
-                        />
-                    ))}
-                </div>
+            {/* Services Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 reveal">
+                {category.services.map((service, i) => (
+                    <ServiceCard
+                        key={service.id}
+                        service={service}
+                        onAction={() => handleViewProviders(service.name)}
+                        delay={i * 50}
+                    />
+                ))}
             </div>
         </main>
     );

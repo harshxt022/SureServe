@@ -1,460 +1,452 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ExploreMoreModal from '../components/ExploreMoreModal';
 
 const LandingPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const heroRef = useRef(null);
+  const glowRef = useRef(null);
+
+  // Scroll detection for navbar
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Cursor-following glow
+  useEffect(() => {
+    const hero = heroRef.current;
+    const glow = glowRef.current;
+    if (!hero || !glow) return;
+
+    const handleMove = (e) => {
+      const rect = hero.getBoundingClientRect();
+      glow.style.left = `${e.clientX - rect.left}px`;
+      glow.style.top = `${e.clientY - rect.top}px`;
+      glow.style.opacity = '1';
+    };
+    const handleLeave = () => { glow.style.opacity = '0'; };
+
+    hero.addEventListener('mousemove', handleMove);
+    hero.addEventListener('mouseleave', handleLeave);
+    return () => {
+      hero.removeEventListener('mousemove', handleMove);
+      hero.removeEventListener('mouseleave', handleLeave);
+    };
+  }, []);
+
+  // Scroll reveal observer
+  useEffect(() => {
+    const els = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => entry.target.classList.add('visible'), i * 80);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  // Magnetic button effect
+  useEffect(() => {
+    const btns = document.querySelectorAll('.magnetic-btn');
+    const handlers = [];
+
+    btns.forEach((btn) => {
+      const move = (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        btn.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
+      };
+      const leave = () => { btn.style.transform = 'translate(0, 0)'; };
+      btn.addEventListener('mousemove', move);
+      btn.addEventListener('mouseleave', leave);
+      handlers.push({ btn, move, leave });
+    });
+
+    return () => {
+      handlers.forEach(({ btn, move, leave }) => {
+        btn.removeEventListener('mousemove', move);
+        btn.removeEventListener('mouseleave', leave);
+      });
+    };
+  }, []);
+
+  const marqueeItems = [
+    '⚡ Electrician', '🔧 Plumber', '❄️ AC Repair', '🧹 Cleaning',
+    '🔨 Carpenter', '📺 Appliances', '🖌️ Painting', '🪳 Pest Control',
+    '🛠️ Installation', '🌳 Outdoor'
+  ];
 
   return (
     <>
-
-
-      {/*  Navbar  */}
-      <nav className="glass sticky top-0 z-50 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ── 1. NAVBAR ────────────────────────────────────── */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-[#FAFAF8]/90 backdrop-blur-md shadow-[0_1px_0_#E8E8E4]' : 'bg-transparent'}`}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            <div className="flex items-center gap-2 group cursor-pointer">
-              <div
-                className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center text-white shadow-lg group-hover:rotate-12 transition-transform duration-300">
-                <i className="fas fa-home text-lg"></i>
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="w-9 h-9 rounded-lg bg-[#4F46E5] flex items-center justify-center text-white text-sm font-bold group-hover:rounded-xl transition-all duration-300">
+                S
               </div>
-              <a href="/" className="text-2xl font-bold font-heading text-gray-900 dark:text-white tracking-tight">SureServe</a>
-            </div>
-            <div className="flex items-center space-x-6">
-              <button onClick={() => { /* toggleDarkMode() */ }}
-                className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                aria-label="Toggle Dark Mode">
-                <i className="theme-toggle-icon fas fa-moon text-xl"></i>
-              </button>
-              <a href="/login"
-                className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">Log
-                In</a>
-              <a href="/register-user"
-                className="relative overflow-hidden group bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-2.5 rounded-full font-medium transition-transform active:scale-95 shadow-md hover:shadow-xl">
-                <span
-                  className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                <span className="relative z-10 group-hover:text-white transition-colors duration-300">Sign Up Free</span>
-              </a>
+              <span className="text-xl font-bold font-heading tracking-tight text-[#1A1A1A]">SureServe</span>
+            </Link>
+
+            <div className="flex items-center gap-8">
+              <a href="#services" className="hidden sm:inline text-sm font-medium text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors">Services</a>
+              <a href="#how-it-works" className="hidden sm:inline text-sm font-medium text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors">How It Works</a>
+              <Link to="/login" className="text-sm font-medium text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors">Log In</Link>
+              <Link to="/register-user" className="magnetic-btn bg-[#4F46E5] hover:bg-[#4338CA] text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-colors shadow-sm">
+                Get Started
+              </Link>
             </div>
           </div>
         </div>
       </nav>
 
-      {/*  1. Hero Section  */}
-      <section className="relative pt-24 pb-32 overflow-hidden">
-        {/*  Decorative Blobs  */}
-        <div className="absolute top-0 inset-x-0 h-[500px] overflow-hidden -z-10 pointer-events-none">
-          <div
-            className="absolute -top-[20%] -right-[10%] w-[600px] h-[600px] rounded-full bg-purple-200/50 blur-[100px] mix-blend-multiply opacity-70 animate-float">
+      {/* ── 2. HERO — Split Screen ──────────────────────── */}
+      <section ref={heroRef} className="relative min-h-[100vh] flex items-center overflow-hidden pt-20">
+        <div ref={glowRef} className="cursor-glow"></div>
+
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+            {/* Left — Text */}
+            <div className="max-w-xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#E8E8E4] text-xs font-semibold text-[#6B6B6B] mb-8 tracking-wide uppercase">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#4F46E5] soft-pulse"></span>
+                Trusted by 10,000+ Homeowners
+              </div>
+
+              <h1 className="text-[clamp(2.5rem,6vw,5rem)] font-bold font-heading text-[#1A1A1A] leading-[1.05] tracking-tight mb-6">
+                Home services,<br />
+                <span className="text-[#4F46E5]">done right.</span>
+              </h1>
+
+              <p className="text-lg text-[#6B6B6B] leading-relaxed mb-10 max-w-md">
+                Book verified electricians, plumbers, and AC technicians in minutes. Upfront pricing. Zero hassle.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4">
+                <a href="#services" className="magnetic-btn bg-[#1A1A1A] hover:bg-[#2D2D2D] text-white px-8 py-4 rounded-full font-semibold text-sm transition-colors shadow-md">
+                  Explore Services
+                </a>
+                <Link to="/register-provider" className="magnetic-btn text-[#6B6B6B] hover:text-[#1A1A1A] font-medium text-sm flex items-center gap-2 group transition-colors">
+                  Become a Provider
+                  <i className="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                </Link>
+              </div>
+            </div>
+
+            {/* Right — Blob + Stats */}
+            <div className="relative hidden lg:flex items-center justify-center">
+              {/* Gradient blob */}
+              <div className="blob w-[420px] h-[420px] rounded-[40%_60%_65%_35%/40%_45%_55%_60%]"
+                style={{
+                  background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 40%, #EC4899 100%)',
+                  opacity: 0.12,
+                }}
+              ></div>
+
+              {/* Floating stat cards */}
+              <div className="absolute top-[15%] right-[5%] bg-white rounded-2xl px-5 py-4 shadow-[0_8px_32px_rgba(0,0,0,0.06)] float-shape">
+                <p className="text-2xl font-bold font-heading text-[#1A1A1A]">4.9★</p>
+                <p className="text-xs text-[#6B6B6B]">Avg. Rating</p>
+              </div>
+
+              <div className="absolute bottom-[18%] left-[2%] bg-white rounded-2xl px-5 py-4 shadow-[0_8px_32px_rgba(0,0,0,0.06)] float-shape" style={{ animationDelay: '2s' }}>
+                <p className="text-2xl font-bold font-heading text-[#1A1A1A]">5K+</p>
+                <p className="text-xs text-[#6B6B6B]">Verified Pros</p>
+              </div>
+
+              <div className="absolute bottom-[5%] right-[15%] bg-white rounded-2xl px-5 py-4 shadow-[0_8px_32px_rgba(0,0,0,0.06)] float-shape" style={{ animationDelay: '4s' }}>
+                <p className="text-2xl font-bold font-heading text-[#1A1A1A]">50K+</p>
+                <p className="text-xs text-[#6B6B6B]">Jobs Done</p>
+              </div>
+            </div>
           </div>
-          <div
-            className="absolute top-[10%] -left-[10%] w-[500px] h-[500px] rounded-full bg-blue-200/50 blur-[100px] mix-blend-multiply opacity-70 animate-float"
-            style={{ animationDelay: '2s' }}></div>
         </div>
+      </section>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center animate-fade-up">
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-sm font-semibold mb-8 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-            #1 Service Marketplace in 2026
+      {/* ── 3. MARQUEE TICKER ────────────────────────────── */}
+      <div className="border-y border-[#E8E8E4] py-5 overflow-hidden bg-[#FAFAF8]">
+        <div className="marquee-track">
+          {[...marqueeItems, ...marqueeItems].map((item, i) => (
+            <span key={i} className="text-sm font-medium text-[#6B6B6B] whitespace-nowrap mx-8 tracking-wide">
+              {item}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ── 4. SERVICES — Bento Grid ─────────────────────── */}
+      <section id="services" className="py-28 relative">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          {/* Section header with number */}
+          <div className="relative mb-16 reveal">
+            <span className="section-number absolute -top-8 -left-4 select-none">01</span>
+            <div className="relative z-10">
+              <h2 className="text-4xl md:text-5xl font-bold font-heading text-[#1A1A1A] tracking-tight mb-4">
+                Services
+              </h2>
+              <p className="text-[#6B6B6B] text-lg max-w-md">
+                From quick fixes to full overhauls. The right expert for every job.
+              </p>
+            </div>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-6">
-            Find Trusted Home <br className="hidden md:block" />
-            <span className="text-gradient">Service Professionals</span>
-          </h1>
-          <p className="text-lg md:text-xl text-gray-500 dark:text-gray-400 mb-10 max-w-2xl mx-auto font-light">
-            Book top-rated electricians, plumbers, AC technicians, and more in minutes. Get your home running smoothly with
-            upfront pricing.
-          </p>
+          {/* Bento Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 reveal">
+            {/* Large card */}
+            <a href="/category/electrical" className="card-accent hover-lift col-span-2 row-span-2 bg-white rounded-3xl p-8 border border-[#E8E8E4] cursor-pointer group transition-shadow hover:shadow-[0_16px_48px_rgba(0,0,0,0.06)]">
+              <span className="text-5xl block mb-6">⚡</span>
+              <h3 className="text-2xl font-bold font-heading text-[#1A1A1A] mb-2">Electrical</h3>
+              <p className="text-[#6B6B6B] text-sm mb-6">Wiring, switches, fans, solar panels and more.</p>
+              <span className="text-[#4F46E5] text-sm font-semibold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                Explore <i className="fas fa-arrow-right text-xs"></i>
+              </span>
+            </a>
 
-          {/*  Search Bar  */}
-          <div
-            className="max-w-2xl mx-auto mb-12 flex items-center glass rounded-full overflow-hidden p-2 shadow-smooth transition-shadow hover:shadow-hover">
-            <div className="pl-4 text-gray-400"><i className="fas fa-search"></i></div>
-            <input type="text" placeholder="What service do you need today?"
-              className="flex-grow px-4 py-3 bg-transparent border-none focus:ring-0 text-gray-700 dark:text-gray-200 placeholder-gray-400 outline-none" />
+            {/* Normal cards */}
+            <a href="/category/plumbing" className="card-accent hover-lift bg-white rounded-3xl p-6 border border-[#E8E8E4] cursor-pointer group transition-shadow hover:shadow-[0_16px_48px_rgba(0,0,0,0.06)]">
+              <span className="text-3xl block mb-4">🔧</span>
+              <h3 className="text-lg font-bold font-heading text-[#1A1A1A]">Plumbing</h3>
+              <span className="text-[#4F46E5] text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity mt-2 block">→</span>
+            </a>
+
+            <a href="/category/ac-services" className="card-accent hover-lift bg-white rounded-3xl p-6 border border-[#E8E8E4] cursor-pointer group transition-shadow hover:shadow-[0_16px_48px_rgba(0,0,0,0.06)]">
+              <span className="text-3xl block mb-4">❄️</span>
+              <h3 className="text-lg font-bold font-heading text-[#1A1A1A]">AC Services</h3>
+              <span className="text-[#4F46E5] text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity mt-2 block">→</span>
+            </a>
+
+            <a href="/category/cleaning" className="card-accent hover-lift bg-white rounded-3xl p-6 border border-[#E8E8E4] cursor-pointer group transition-shadow hover:shadow-[0_16px_48px_rgba(0,0,0,0.06)]">
+              <span className="text-3xl block mb-4">🧹</span>
+              <h3 className="text-lg font-bold font-heading text-[#1A1A1A]">Cleaning</h3>
+              <span className="text-[#4F46E5] text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity mt-2 block">→</span>
+            </a>
+
+            <a href="/category/carpentry" className="card-accent hover-lift bg-white rounded-3xl p-6 border border-[#E8E8E4] cursor-pointer group transition-shadow hover:shadow-[0_16px_48px_rgba(0,0,0,0.06)]">
+              <span className="text-3xl block mb-4">🔨</span>
+              <h3 className="text-lg font-bold font-heading text-[#1A1A1A]">Carpentry</h3>
+              <span className="text-[#4F46E5] text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity mt-2 block">→</span>
+            </a>
+
+            {/* Wide card spanning 2 cols */}
+            <a href="/category/appliances" className="card-accent hover-lift col-span-2 bg-white rounded-3xl p-6 border border-[#E8E8E4] cursor-pointer group flex items-center gap-6 transition-shadow hover:shadow-[0_16px_48px_rgba(0,0,0,0.06)]">
+              <span className="text-4xl">📺</span>
+              <div>
+                <h3 className="text-lg font-bold font-heading text-[#1A1A1A]">Appliance Repair</h3>
+                <p className="text-[#6B6B6B] text-sm">Refrigerators, washing machines, microwaves & more</p>
+              </div>
+              <i className="fas fa-arrow-right text-[#4F46E5] ml-auto opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </a>
+          </div>
+
+          <div className="text-center mt-12 reveal">
             <button
-              className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-3 rounded-full font-medium hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 hover:text-white dark:hover:text-white transition-all duration-300 shadow-md">
-              Search
+              onClick={() => setIsModalOpen(true)}
+              className="magnetic-btn bg-[#1A1A1A] hover:bg-[#2D2D2D] text-white px-8 py-4 rounded-full font-semibold text-sm transition-colors shadow-md"
+            >
+              View All Categories
             </button>
           </div>
 
-          {/*  Hero Buttons  */}
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-            <a href="#services"
-              className="group flex items-center gap-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 px-8 py-3.5 rounded-full font-semibold border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all shadow-sm hover:shadow-md">
-              <i className="fas fa-compass group-hover:rotate-45 transition-transform duration-300"></i> Explore Services
-            </a>
-            <a href="/register-provider"
-              className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors px-4 py-3.5 group">
-              Become a Provider <i className="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-            </a>
+          <ExploreMoreModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        </div>
+      </section>
+
+      {/* ── 5. HOW IT WORKS — Horizontal Timeline ────────── */}
+      <section id="how-it-works" className="py-28 border-y border-[#E8E8E4]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="relative mb-20 reveal">
+            <span className="section-number absolute -top-8 -left-4 select-none">02</span>
+            <div className="relative z-10">
+              <h2 className="text-4xl md:text-5xl font-bold font-heading text-[#1A1A1A] tracking-tight mb-4">
+                How It Works
+              </h2>
+              <p className="text-[#6B6B6B] text-lg max-w-md">Four steps. That's it.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+            {/* Connecting line */}
+            <div className="hidden md:block absolute top-[3rem] left-[12%] right-[12%] h-[1px] bg-[#E8E8E4]"></div>
+
+            {[
+              { num: '01', icon: 'fa-search', title: 'Search', desc: 'Find the right service for your needs.' },
+              { num: '02', icon: 'fa-calendar-alt', title: 'Schedule', desc: 'Pick a time slot that works for you.' },
+              { num: '03', icon: 'fa-paper-plane', title: 'Confirm', desc: 'Book instantly with upfront pricing.' },
+              { num: '04', icon: 'fa-check-circle', title: 'Done', desc: 'Expert completes the work. Pay securely.' },
+            ].map((step, i) => (
+              <div key={i} className="text-center relative reveal" style={{ transitionDelay: `${i * 100}ms` }}>
+                <div className="w-24 h-24 mx-auto bg-white border border-[#E8E8E4] rounded-3xl flex flex-col items-center justify-center relative z-10 shadow-sm mb-6 hover:border-[#4F46E5] transition-colors">
+                  <span className="text-xs font-bold text-[#4F46E5] font-heading tracking-widest">{step.num}</span>
+                  <i className={`fas ${step.icon} text-xl text-[#1A1A1A] mt-1`}></i>
+                </div>
+                <h3 className="text-lg font-bold font-heading text-[#1A1A1A] mb-2">{step.title}</h3>
+                <p className="text-sm text-[#6B6B6B] max-w-[200px] mx-auto">{step.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/*  2. Service Categories  */}
-      <section id="services" className="py-24 relative z-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold font-heading text-gray-900 dark:text-white mb-4">Popular Services</h2>
-            <p className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">From quick fixes to massive overhauls, we have the
-              right expert for
-              every job.</p>
+      {/* ── 6. TRUST + PROVIDERS — Asymmetric ────────────── */}
+      <section className="py-28">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="relative mb-20 reveal">
+            <span className="section-number absolute -top-8 -left-4 select-none">03</span>
+            <div className="relative z-10">
+              <h2 className="text-4xl md:text-5xl font-bold font-heading text-[#1A1A1A] tracking-tight mb-4">
+                Why SureServe?
+              </h2>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-
-            {/*  Category Cards  */}
-            <a href="#"
-              className="group hover-lift bg-white dark:bg-gray-800 rounded-2xl p-6 text-center border border-gray-100 dark:border-gray-700 shadow-sm">
-              <div
-                className="w-16 h-16 mx-auto bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-3xl mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300 shadow-inner">
-                <i className="fas fa-bolt"></i>
-              </div>
-              <h3 className="font-semibold text-gray-800 dark:text-gray-100 font-heading">Electrician</h3>
-            </a>
-
-            <a href="#"
-              className="group hover-lift bg-white dark:bg-gray-800 rounded-2xl p-6 text-center border border-gray-100 dark:border-gray-700 shadow-sm">
-              <div
-                className="w-16 h-16 mx-auto bg-cyan-50 dark:bg-cyan-900/30 text-cyan-500 dark:text-cyan-400 rounded-2xl flex items-center justify-center text-3xl mb-4 group-hover:bg-cyan-500 group-hover:text-white transition-colors duration-300 shadow-inner">
-                <i className="fas fa-faucet"></i>
-              </div>
-              <h3 className="font-semibold text-gray-800 dark:text-gray-100 font-heading">Plumber</h3>
-            </a>
-
-            <a href="#"
-              className="group hover-lift bg-white dark:bg-gray-800 rounded-2xl p-6 text-center border border-gray-100 dark:border-gray-700 shadow-sm">
-              <div
-                className="w-16 h-16 mx-auto bg-sky-50 dark:bg-sky-900/30 text-sky-500 dark:text-sky-400 rounded-2xl flex items-center justify-center text-3xl mb-4 group-hover:bg-sky-500 group-hover:text-white transition-colors duration-300 shadow-inner">
-                <i className="fas fa-snowflake"></i>
-              </div>
-              <h3 className="font-semibold text-gray-800 dark:text-gray-100 font-heading">AC Repair</h3>
-            </a>
-
-            <a href="#"
-              className="group hover-lift bg-white dark:bg-gray-800 rounded-2xl p-6 text-center border border-gray-100 dark:border-gray-700 shadow-sm">
-              <div
-                className="w-16 h-16 mx-auto bg-purple-50 dark:bg-purple-900/30 text-purple-500 dark:text-purple-400 rounded-2xl flex items-center justify-center text-3xl mb-4 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300 shadow-inner">
-                <i className="fas fa-broom"></i>
-              </div>
-              <h3 className="font-semibold text-gray-800 dark:text-gray-100 font-heading">Cleaning</h3>
-            </a>
-
-            <a href="#"
-              className="group hover-lift bg-white dark:bg-gray-800 rounded-2xl p-6 text-center border border-gray-100 dark:border-gray-700 shadow-sm">
-              <div
-                className="w-16 h-16 mx-auto bg-orange-50 dark:bg-orange-900/30 text-orange-500 dark:text-orange-400 rounded-2xl flex items-center justify-center text-3xl mb-4 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-300 shadow-inner">
-                <i className="fas fa-hammer"></i>
-              </div>
-              <h3 className="font-semibold text-gray-800 dark:text-gray-100 font-heading">Carpenter</h3>
-            </a>
-
-            <a href="#"
-              className="group hover-lift bg-white dark:bg-gray-800 rounded-2xl p-6 text-center border border-gray-100 dark:border-gray-700 shadow-sm">
-              <div
-                className="w-16 h-16 mx-auto bg-rose-50 dark:bg-rose-900/30 text-rose-500 dark:text-rose-400 rounded-2xl flex items-center justify-center text-3xl mb-4 group-hover:bg-rose-500 group-hover:text-white transition-colors duration-300 shadow-inner">
-                <i className="fas fa-blender"></i>
-              </div>
-              <h3 className="font-semibold text-gray-800 dark:text-gray-100 font-heading">Appliances</h3>
-            </a>
-
-          </div>
-        </div>
-
-        <div className="text-center mt-12 mb-8">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-4 rounded-xl font-bold hover:shadow-lg transition-all"
-          >
-            Explore More Services
-          </button>
-        </div>
-
-        <ExploreMoreModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-      </section>
-
-      {/*  3. How It Works  */}
-      <section
-        className="py-24 bg-white dark:bg-gray-900 relative border-y border-gray-100 dark:border-gray-800 transition-colors duration-300">
-        <div
-          className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNFMkU4RjAiLz48L3N2Zz4=')] opacity-50 dark:opacity-10">
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <h2 className="text-3xl md:text-4xl font-bold font-heading text-center text-gray-900 dark:text-white mb-16">How It
-            Works</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-
-            {/*  Step 1  */}
-            <div className="relative text-center group">
-              <div
-                className="w-20 h-20 mx-auto bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-full flex items-center justify-center z-10 relative shadow-sm group-hover:border-blue-500 transition-colors duration-300">
-                <i className="fas fa-search text-2xl text-blue-600 dark:text-blue-400"></i>
-              </div>
-              <div
-                className="hidden md:block absolute top-10 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-gray-200 dark:from-gray-700 to-transparent">
-              </div>
-              <h3 className="text-xl font-bold font-heading mt-6 mb-2 text-gray-900 dark:text-white">1. Search</h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Find the specific service and review expert profiles.</p>
-            </div>
-
-            {/*  Step 2  */}
-            <div className="relative text-center group">
-              <div
-                className="w-20 h-20 mx-auto bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-full flex items-center justify-center z-10 relative shadow-sm group-hover:border-purple-500 transition-colors duration-300">
-                <i className="far fa-calendar-alt text-2xl text-purple-600 dark:text-purple-400"></i>
-              </div>
-              <div
-                className="hidden md:block absolute top-10 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-gray-200 dark:from-gray-700 to-transparent">
-              </div>
-              <h3 className="text-xl font-bold font-heading mt-6 mb-2 text-gray-900 dark:text-white">2. Availability</h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Check their real-time calendar and pick a slot.</p>
-            </div>
-
-            {/*  Step 3  */}
-            <div className="relative text-center group">
-              <div
-                className="w-20 h-20 mx-auto bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-full flex items-center justify-center z-10 relative shadow-sm group-hover:border-pink-500 transition-colors duration-300">
-                <i className="fas fa-paper-plane text-2xl text-pink-600 dark:text-pink-400"></i>
-              </div>
-              <div
-                className="hidden md:block absolute top-10 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-gray-200 dark:from-gray-700 to-transparent">
-              </div>
-              <h3 className="text-xl font-bold font-heading mt-6 mb-2 text-gray-900 dark:text-white">3. Book Slot</h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Send a booking request and wait for approval.</p>
-            </div>
-
-            {/*  Step 4  */}
-            <div className="relative text-center group">
-              <div
-                className="w-20 h-20 mx-auto bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-full flex items-center justify-center z-10 relative shadow-sm group-hover:border-green-500 transition-colors duration-300">
-                <i className="fas fa-check-circle text-2xl text-green-500 dark:text-green-400"></i>
-              </div>
-              <h3 className="text-xl font-bold font-heading mt-6 mb-2 text-gray-900 dark:text-white">4. Job Done</h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">The expert completes the work and you pay securely.</p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/*  4 & 5. Featured / Trust Signals (Merged Layout)  */}
-      <section className="py-24 bg-[#FAFAFC] dark:bg-gray-800/30 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-
-            {/*  Left: Trust Signals  */}
-            <div className="lg:col-span-5">
-              <h2 className="text-3xl md:text-4xl font-bold font-heading text-gray-900 dark:text-white mb-6">Why Choose
-                SureServe?</h2>
-              <p className="text-gray-500 dark:text-gray-400 mb-10 text-lg">We take the hassle out of home maintenance.
-                Guaranteed quality,
-                up-front pricing, and a seamless booking experience.</p>
-
-              <div className="space-y-6">
-                <div
-                  className="flex items-start gap-4 p-4 rounded-2xl hover:bg-white dark:hover:bg-gray-800 hover:shadow-sm transition duration-300 border border-transparent hover:border-gray-100 dark:hover:border-gray-700">
-                  <div
-                    className="w-12 h-12 shrink-0 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl">
-                    <i className="fas fa-shield-alt"></i>
+          <div className="grid lg:grid-cols-12 gap-16 items-start">
+            {/* Left — Trust Points */}
+            <div className="lg:col-span-5 space-y-8 reveal">
+              {[
+                { icon: 'fa-shield-alt', title: 'Verified Professionals', desc: 'Every provider undergoes a strict background check and skill assessment.' },
+                { icon: 'fa-wallet', title: 'Transparent Pricing', desc: 'You approve official quotes before work begins. No hidden charges.' },
+                { icon: 'fa-calendar-check', title: 'Easy Scheduling', desc: 'Book exact time slots instantly. No back-and-forth calls.' },
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-5 group">
+                  <div className="w-12 h-12 shrink-0 rounded-xl bg-[#4F46E5]/8 flex items-center justify-center group-hover:bg-[#4F46E5] transition-colors duration-300">
+                    <i className={`fas ${item.icon} text-[#4F46E5] group-hover:text-white transition-colors text-lg`}></i>
                   </div>
                   <div>
-                    <h4 className="text-lg font-bold text-gray-900 dark:text-white font-heading">Verified Professionals</h4>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Every provider undergoes a strict background
-                      check and skill
-                      assessment.</p>
+                    <h4 className="text-base font-bold font-heading text-[#1A1A1A] mb-1">{item.title}</h4>
+                    <p className="text-sm text-[#6B6B6B] leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
-
-                <div
-                  className="flex items-start gap-4 p-4 rounded-2xl hover:bg-white dark:hover:bg-gray-800 hover:shadow-sm transition duration-300 border border-transparent hover:border-gray-100 dark:hover:border-gray-700">
-                  <div
-                    className="w-12 h-12 shrink-0 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xl">
-                    <i className="fas fa-wallet"></i>
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-bold text-gray-900 dark:text-white font-heading">Transparent Pricing</h4>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">You approve official quotes before any work
-                      begins. No hidden
-                      charges.</p>
-                  </div>
-                </div>
-
-                <div
-                  className="flex items-start gap-4 p-4 rounded-2xl hover:bg-white dark:hover:bg-gray-800 hover:shadow-sm transition duration-300 border border-transparent hover:border-gray-100 dark:hover:border-gray-700">
-                  <div
-                    className="w-12 h-12 shrink-0 rounded-full bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 flex items-center justify-center text-xl">
-                    <i className="fas fa-calendar-check"></i>
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-bold text-gray-900 dark:text-white font-heading">Easy Scheduling</h4>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Say goodbye to back-and-forth calls. Book exact
-                      time slots
-                      instantly.</p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
 
-            {/*  Right: Featured Provider Cards  */}
-            <div className="lg:col-span-7 grid sm:grid-cols-2 gap-6 relative">
-              {/*  Decoration  */}
-              <div
-                className="absolute -top-10 -right-10 w-32 h-32 bg-yellow-100 rounded-full mix-blend-multiply blur-2xl opacity-70">
-              </div>
-
-              {/*  Card 1  */}
-              <div
-                className="hover-lift bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-smooth border border-gray-100 dark:border-gray-700 mt-0 sm:mt-12 transition-colors duration-300">
-                <div className="flex justify-between items-start mb-4">
-                  <img src="https://ui-avatars.com/api/?name=Ramesh+Sharma&background=2563eb&color=fff&size=128"
-                    alt="Profile" className="w-16 h-16 rounded-2xl object-cover shadow-sm" />
-                  <div
-                    className="bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
-                    <i className="fas fa-star text-xs"></i> 4.9
+            {/* Right — Provider Cards (offset) */}
+            <div className="lg:col-span-7 grid sm:grid-cols-2 gap-6 reveal">
+              <div className="hover-lift bg-white rounded-3xl p-6 border border-[#E8E8E4] sm:mt-12 transition-shadow hover:shadow-[0_16px_48px_rgba(0,0,0,0.06)]">
+                <div className="flex justify-between items-start mb-5">
+                  <img src="https://ui-avatars.com/api/?name=Ramesh+Sharma&background=4F46E5&color=fff&size=128" alt="Ramesh Sharma" className="w-14 h-14 rounded-2xl object-cover" />
+                  <div className="bg-[#FAFAF8] text-[#1A1A1A] px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1 border border-[#E8E8E4]">
+                    <i className="fas fa-star text-[#F59E0B] text-xs"></i> 4.9
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white font-heading">Ramesh Sharma</h3>
-                <p className="text-blue-600 dark:text-blue-400 font-medium text-sm mb-4">Master Electrician</p>
-                <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 line-clamp-2">12+ years of experience in residential
-                  and commercial
-                  wiring, panel upgrades, and circuit repairs.</p>
-                <button
-                  className="w-full bg-gray-50 dark:bg-gray-700 hover:bg-blue-600 text-gray-700 dark:text-gray-200 hover:text-white dark:hover:text-white border border-gray-200 dark:border-gray-600 hover:border-blue-600 dark:hover:border-blue-500 py-3 rounded-xl font-semibold transition-all duration-300">
+                <h3 className="text-lg font-bold font-heading text-[#1A1A1A]">Ramesh Sharma</h3>
+                <p className="text-[#4F46E5] font-medium text-sm mb-3">Master Electrician</p>
+                <p className="text-[#6B6B6B] text-sm line-clamp-2 mb-5">12+ years in residential and commercial wiring, panel upgrades, and circuit repairs.</p>
+                <button className="w-full bg-[#FAFAF8] hover:bg-[#4F46E5] text-[#1A1A1A] hover:text-white border border-[#E8E8E4] hover:border-transparent py-3 rounded-xl text-sm font-semibold transition-all duration-300">
                   View Profile
                 </button>
               </div>
 
-              {/*  Card 2  */}
-              <div
-                className="hover-lift bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-smooth border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                <div className="flex justify-between items-start mb-4">
-                  <img src="https://ui-avatars.com/api/?name=Amit+Verma&background=7c3aed&color=fff&size=128" alt="Profile"
-                    className="w-16 h-16 rounded-2xl object-cover shadow-sm" />
-                  <div
-                    className="bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
-                    <i className="fas fa-star text-xs"></i> 5.0
+              <div className="hover-lift bg-white rounded-3xl p-6 border border-[#E8E8E4] transition-shadow hover:shadow-[0_16px_48px_rgba(0,0,0,0.06)]">
+                <div className="flex justify-between items-start mb-5">
+                  <img src="https://ui-avatars.com/api/?name=Amit+Verma&background=7C3AED&color=fff&size=128" alt="Amit Verma" className="w-14 h-14 rounded-2xl object-cover" />
+                  <div className="bg-[#FAFAF8] text-[#1A1A1A] px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1 border border-[#E8E8E4]">
+                    <i className="fas fa-star text-[#F59E0B] text-xs"></i> 5.0
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white font-heading">Amit Verma</h3>
-                <p className="text-purple-600 dark:text-purple-400 font-medium text-sm mb-4">Plumbing Expert</p>
-                <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 line-clamp-2">Specializing in leak detection, pipe
-                  fitting, and
-                  complete bathroom overhauls with a 100% satisfaction record.</p>
-                <button
-                  className="w-full bg-gray-50 dark:bg-gray-700 hover:bg-blue-600 text-gray-700 dark:text-gray-200 hover:text-white dark:hover:text-white border border-gray-200 dark:border-gray-600 hover:border-blue-600 dark:hover:border-blue-500 py-3 rounded-xl font-semibold transition-all duration-300">
+                <h3 className="text-lg font-bold font-heading text-[#1A1A1A]">Amit Verma</h3>
+                <p className="text-[#7C3AED] font-medium text-sm mb-3">Plumbing Expert</p>
+                <p className="text-[#6B6B6B] text-sm line-clamp-2 mb-5">Specializing in leak detection, pipe fitting, and bathroom overhauls with 100% satisfaction.</p>
+                <button className="w-full bg-[#FAFAF8] hover:bg-[#4F46E5] text-[#1A1A1A] hover:text-white border border-[#E8E8E4] hover:border-transparent py-3 rounded-xl text-sm font-semibold transition-all duration-300">
                   View Profile
                 </button>
               </div>
-
             </div>
-
           </div>
         </div>
       </section>
 
-      {/*  6. CTA Section  */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gray-900"></div>
-        {/*  Abstract SVG Background  */}
-        <div className="absolute inset-0 opacity-20">
-          <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <path d="M0,0 C30,40 70,60 100,0 L100,100 L0,100 Z" fill="url(#grad)" />
-            <defs>
-              <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#3b82f6" />
-                <stop offset="100%" stopColor="#8b5cf6" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
+      {/* ── 7. CTA — Full-Width Dark ─────────────────────── */}
+      <section className="py-32 bg-[#1A1A1A] relative overflow-hidden">
+        {/* Subtle grid overlay */}
+        <div className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+        ></div>
 
-        <div className="max-w-4xl mx-auto px-4 relative z-10 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold font-heading text-white mb-6">Need help at home today?</h2>
-          <p className="text-xl text-gray-300 mb-10 font-light">Join thousands of customers finding reliable help, or grow your
-            independent business as a provider.</p>
-
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-            <a href="#services"
-              className="w-full sm:w-auto bg-white text-gray-900 px-8 py-4 rounded-full font-bold hover:scale-105 transition-transform duration-300 shadow-xl">
-              Book a Service Now
+        <div className="max-w-4xl mx-auto px-6 text-center relative z-10 reveal">
+          <h2 className="text-5xl md:text-7xl font-bold font-heading text-white tracking-tight mb-6 leading-[1.05]">
+            Let's fix that.
+          </h2>
+          <p className="text-lg text-gray-400 mb-12 max-w-lg mx-auto">
+            Join thousands of homeowners who trust SureServe for everything from leaky taps to full renovations.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <a href="#services" className="magnetic-btn bg-white text-[#1A1A1A] px-8 py-4 rounded-full font-semibold text-sm hover:bg-gray-100 transition-colors shadow-lg">
+              Book a Service
             </a>
-            <a href="/register-provider"
-              className="w-full sm:w-auto glass-dark text-white px-8 py-4 rounded-full font-bold hover:bg-gray-800 transition-colors duration-300 border border-gray-700">
+            <Link to="/register-provider" className="magnetic-btn border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 px-8 py-4 rounded-full font-semibold text-sm transition-colors">
               Join as a Provider
-            </a>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/*  7. Footer  */}
-      <footer className="bg-gray-950 text-gray-400 py-16 border-t border-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ── 8. FOOTER — Minimal Ivory ────────────────────── */}
+      <footer className="py-16 bg-[#FAFAF8] border-t border-[#E8E8E4]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div className="md:col-span-1">
-              <a href="/" className="text-3xl font-bold font-heading text-white tracking-tight mb-4 inline-block">SureServe</a>
-              <p className="text-sm mt-2 mb-6">Making home services reliable, transparent, and effortlessly easy to book for
-                everyone.</p>
-              <div className="flex space-x-4">
-                <a href="#"
-                  className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors duration-300"><i
-                    className="fab fa-twitter"></i></a>
-                <a href="#"
-                  className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors duration-300"><i
-                    className="fab fa-facebook-f"></i></a>
-                <a href="#"
-                  className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors duration-300"><i
-                    className="fab fa-instagram"></i></a>
-              </div>
+              <Link to="/" className="text-2xl font-bold font-heading text-[#1A1A1A] tracking-tight mb-4 inline-block">
+                SureServe
+              </Link>
+              <p className="text-sm text-[#6B6B6B] mt-2">
+                Making home services reliable, transparent, and effortlessly easy.
+              </p>
             </div>
 
             <div>
-              <h4 className="text-white font-bold font-heading mb-6 tracking-wide">Platform</h4>
-              <ul className="space-y-3 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">How it works</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Browse Services</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Pricing Structure</a></li>
+              <h4 className="text-xs font-bold font-heading text-[#1A1A1A] tracking-widest uppercase mb-5">Platform</h4>
+              <ul className="space-y-3 text-sm text-[#6B6B6B]">
+                <li><a href="#how-it-works" className="hover:text-[#1A1A1A] transition-colors">How it works</a></li>
+                <li><Link to="/services" className="hover:text-[#1A1A1A] transition-colors">Browse Services</Link></li>
+                <li><a href="#" className="hover:text-[#1A1A1A] transition-colors">Pricing</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-white font-bold font-heading mb-6 tracking-wide">Providers</h4>
-              <ul className="space-y-3 text-sm">
-                <li><a href="/register-provider" className="hover:text-white transition-colors">Sign up as Expert</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Provider Rules</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Success Stories</a></li>
+              <h4 className="text-xs font-bold font-heading text-[#1A1A1A] tracking-widest uppercase mb-5">Providers</h4>
+              <ul className="space-y-3 text-sm text-[#6B6B6B]">
+                <li><Link to="/register-provider" className="hover:text-[#1A1A1A] transition-colors">Become a Provider</Link></li>
+                <li><a href="#" className="hover:text-[#1A1A1A] transition-colors">Provider Guidelines</a></li>
+                <li><a href="#" className="hover:text-[#1A1A1A] transition-colors">Success Stories</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-white font-bold font-heading mb-6 tracking-wide">Support</h4>
-              <ul className="space-y-3 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+              <h4 className="text-xs font-bold font-heading text-[#1A1A1A] tracking-widest uppercase mb-5">Support</h4>
+              <ul className="space-y-3 text-sm text-[#6B6B6B]">
+                <li><a href="#" className="hover:text-[#1A1A1A] transition-colors">Help Center</a></li>
+                <li><a href="#" className="hover:text-[#1A1A1A] transition-colors">Contact Us</a></li>
+                <li><a href="#" className="hover:text-[#1A1A1A] transition-colors">Privacy Policy</a></li>
               </ul>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-gray-900 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
-            <p>&copy; 2026 SureServe Marketplace. All rights reserved.</p>
-            <div className="flex gap-4">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/2560px-PayPal.svg.png"
-                alt="Paypal" className="h-5 opacity-50 grayscale hover:grayscale-0 transition duration-300" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Visa.svg/1200px-Visa.svg.png" alt="Visa"
-                className="h-5 opacity-50 grayscale hover:grayscale-0 transition duration-300" />
+          <div className="pt-8 border-t border-[#E8E8E4] flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-[#6B6B6B]">
+            <p>&copy; 2026 SureServe. All rights reserved.</p>
+            <div className="flex gap-5">
+              <a href="#" className="hover:text-[#1A1A1A] transition-colors"><i className="fab fa-twitter"></i></a>
+              <a href="#" className="hover:text-[#1A1A1A] transition-colors"><i className="fab fa-facebook-f"></i></a>
+              <a href="#" className="hover:text-[#1A1A1A] transition-colors"><i className="fab fa-instagram"></i></a>
+              <a href="#" className="hover:text-[#1A1A1A] transition-colors"><i className="fab fa-linkedin-in"></i></a>
             </div>
           </div>
         </div>
       </footer>
-
-
     </>
   );
 };
