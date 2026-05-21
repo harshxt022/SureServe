@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import api from '../api/axios';
 
 const ProfilePage = () => {
     const { token, user, updateUser, logout } = useAuth();
@@ -19,17 +20,11 @@ const ProfilePage = () => {
 
     const fetchProfile = async () => {
         try {
-            const res = await fetch('/api/auth/profile', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Failed to fetch profile');
-            setProfile(data);
-            setFormData(data);
+            const res = await api.get('/auth/profile');
+            setProfile(res.data);
+            setFormData(res.data);
         } catch (err) {
-            setError(err.message);
+            setError(err.response?.data?.message || err.message || 'Failed to fetch profile');
         } finally {
             setLoading(false);
         }
@@ -45,16 +40,7 @@ const ProfilePage = () => {
         setSuccessMsg('');
         
         try {
-            const res = await fetch('/api/auth/profile', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(formData)
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Failed to update profile');
+            const res = await api.put('/auth/profile', formData);
             
             setProfile(formData);
             setIsEditing(false);
@@ -68,7 +54,7 @@ const ProfilePage = () => {
             
             setTimeout(() => setSuccessMsg(''), 3000);
         } catch (err) {
-            setError(err.message);
+            setError(err.response?.data?.message || err.message || 'Failed to update profile');
         }
     };
 

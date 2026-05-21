@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import api from '../api/axios';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -32,31 +33,21 @@ const LoginPage = () => {
     setMessage('Logging in...');
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, role })
-      });
+      const response = await api.post('/auth/login', { email, password, role });
+      const data = response.data;
 
-      const data = await response.json();
+      setMessage('Login successful! Redirecting...');
 
-      if (response.ok) {
-        setMessage('Login successful! Redirecting...');
+      // Use AuthContext to persist session
+      const { token, role: userRole, ...userData } = data;
+      login(token, userData, userRole);
 
-        // Use AuthContext to persist session
-        const { token, role: userRole, ...userData } = data;
-        login(token, userData, userRole);
-
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 1500);
-      } else {
-        setIsError(true);
-        setMessage(data.message || 'Login failed');
-      }
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1500);
     } catch (err) {
       setIsError(true);
-      setMessage('Network error. Please try again.');
+      setMessage(err.response?.data?.message || 'Network error. Please try again.');
     }
   };
 

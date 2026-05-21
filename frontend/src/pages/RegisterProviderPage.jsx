@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import api from '../api/axios';
 
 const RegisterProviderPage = () => {
   const navigate = useNavigate();
@@ -46,26 +47,15 @@ const RegisterProviderPage = () => {
     setMessage('Submitting application...');
 
     try {
-      const response = await fetch('/api/auth/register/provider', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
+      const response = await api.post('/auth/register/provider', formData);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage('Application successful! Please log in.');
-        setTimeout(() => {
-          navigate('/login');
-        }, 1500);
-      } else {
-        setIsError(true);
-        setMessage(data.message || 'Application failed');
-      }
+      setMessage('Application successful! Please log in.');
+      setTimeout(() => {
+        navigate('/login');
+      }, 1500);
     } catch (err) {
       setIsError(true);
-      setMessage('Network error. Please try again.');
+      setMessage(err.response?.data?.message || 'Network error. Please try again.');
     }
   };
 
