@@ -1,0 +1,1 @@
+// Legacy MongoDB config (obsolete)

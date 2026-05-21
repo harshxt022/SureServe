@@ -1,0 +1,49 @@
+{
+  "name": "sureserve-backend",
+  "version": "1.0.0",
+  "description": "Backend for service marketplace",
+  "keywords": [
+    "node",
+    "express",
+    "postgresql",
+    "backend",
+    "api"
+  ],
+  "homepage": "https://github.com/harshxt022/SureServe#readme",
+  "bugs": {
+    "url": "https://github.com/harshxt022/SureServe/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harshxt022/SureServe.git"
+  },
+  "license": "ISC",
+  "author": "Harshit Hassija",
+  "type": "commonjs",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "server": "nodemon src/server.js",
+    "client": "npm run dev --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "npm install --prefix frontend && npm run build --prefix frontend"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dayjs": "^1.11.20",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "joi": "^18.1.2",
+    "jsonwebtoken": "^9.0.3",
+    "node-cron": "^4.2.1",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.14",
+    "pg": "^8.21.0",
+    "prisma": "^5.22.0"
+  }
+}

@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  password_hash String
+  role          String   @default("customer")
+  phone         String?
+  addresses     Json?
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
+
+  provider      Provider?
+  bookingsAsCust Booking[] @relation("CustomerBookings")
+  messages      Message[]
+  reviews       Review[]
+  notifications Notification[]
+}
+
+model Provider {
+  id                    String   @id @default(uuid())
+  user_id               String   @unique
+  user                  User     @relation(fields: [user_id], references: [id])
+  bio                   String?
+  experience_years      Int?
+  main_profession       String?
+  avg_rating            Float    @default(0)
+  rating_count          Int      @default(0)
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  services              ProviderService[]
+  availability          ProviderAvailability?
+  bookings              Booking[] @relation("ProviderBookings")
+  reviews               Review[]
+}
+
+model Service {
+  id          String   @id @default(uuid())
+  name        String
+  category    String
+  description String?
+  base_price  Float
+  icon        String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  providers   ProviderService[]
+  bookings    Booking[]
+}
+
+model ProviderService {
+  provider_id  String
+  service_id   String
+  custom_price Float?
+
+  provider     Provider @relation(fields: [provider_id], references: [id])
+  service      Service  @relation(fields: [service_id], references: [id])
+
+  @@id([provider_id, service_id])
+}
+
+model ProviderAvailability {
+  id                   String   @id @default(uuid())
+  provider_id          String   @unique
+  provider             Provider @relation(fields: [provider_id], references: [id])
+  weekly_schedule      Json     // Store as JSON for simplicity (matches mongoose struct)
+  slot_duration_minutes Int      @default(60)
+  buffer_minutes       Int      @default(15)
+  advance_booking_days Int      @default(14)
+  min_notice_hours     Int      @default(2)
+  blackout_dates       Json?    // Array of ISO strings
+  custom_slots         Json?
+  is_accepting_bookings Boolean @default(true)
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+}
+
+model Booking {
+  id               String   @id @default(uuid())
+  booking_code     String   @unique
+  customer_id      String
+  provider_id      String
+  service_id       String
+  customer         User     @relation("CustomerBookings", fields: [customer_id], references: [id])
+  provider         Provider @relation("ProviderBookings", fields: [provider_id], references: [id])
+  service          Service  @relation(fields: [service_id], references: [id])
+
+  scheduled_date   DateTime
+  slot_start       String
+  slot_end         String
+  timezone         String   @default("Asia/Kolkata")
+  
+  address          Json     // snapshot fields
+  pricing          Json     // baseAmount, taxes, discount, total, currency
+  
+  status           String   @default("PENDING") // PENDING, ACCEPTED, REJECTED, EXPIRED, CANCELLED, IN_PROGRESS, COMPLETED, REVIEWED
+  timeline         Json?    // Array of timeline events
+
+  responded_at     DateTime?
+  rejection_reason String?
+  expires_at       DateTime?
+
+  notes            String?
+  otp              String?
+  payment_status   String   @default("UNPAID") // UNPAID, PAID, REFUNDED
+
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  messages         Message[]
+  reviews          Review[]
+
+  @@index([provider_id, scheduled_date, slot_start])
+  @@index([customer_id, status])
+}
+
+model Message {
+  id             String   @id @default(uuid())
+  booking_id     String
+  booking        Booking  @relation(fields: [booking_id], references: [id])
+  sender_user_id String
+  sender         User     @relation(fields: [sender_user_id], references: [id])
+  message        String
+  created_at     DateTime @default(now())
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  booking_id  String
+  booking     Booking  @relation(fields: [booking_id], references: [id])
+  customer_id String
+  customer    User     @relation(fields: [customer_id], references: [id])
+  provider_id String
+  provider    Provider @relation(fields: [provider_id], references: [id])
+  rating      Int
+  comment     String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+model Notification {
+  id         String   @id @default(uuid())
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id])
+  type       String
+  title      String
+  body       String
+  link       String?
+  read       Boolean  @default(false)
+  created_at DateTime @default(now())
+}

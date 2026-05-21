@@ -1,0 +1,85 @@
+{
+  "hash": "59754f1e",
+  "configHash": "d16ef689",
+  "lockfileHash": "81dc5ee2",
+  "browserHash": "dbd34a7d",
+  "optimized": {
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "d6951b96",
+      "needsInterop": true
+    },
+    "react-dom": {
+      "src": "../../node_modules/react-dom/index.js",
+      "file": "react-dom.js",
+      "fileHash": "13b2caaa",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "a10cc3d2",
+      "needsInterop": true
+    },
+    "react/jsx-runtime": {
+      "src": "../../node_modules/react/jsx-runtime.js",
+      "file": "react_jsx-runtime.js",
+      "fileHash": "8c7e6f45",
+      "needsInterop": true
+    },
+    "axios": {
+      "src": "../../node_modules/axios/index.js",
+      "file": "axios.js",
+      "fileHash": "ab9bd661",
+      "needsInterop": false
+    },
+    "dayjs": {
+      "src": "../../node_modules/dayjs/dayjs.min.js",
+      "file": "dayjs.js",
+      "fileHash": "f73269ee",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "3a350296",
+      "needsInterop": true
+    },
+    "react-hot-toast": {
+      "src": "../../node_modules/react-hot-toast/dist/index.mjs",
+      "file": "react-hot-toast.js",
+      "fileHash": "22346485",
+      "needsInterop": false
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.js",
+      "file": "react-router-dom.js",
+      "fileHash": "1e6bd7eb",
+      "needsInterop": false
+    },
+    "socket.io-client": {
+      "src": "../../node_modules/socket.io-client/build/esm/index.js",
+      "file": "socket__io-client.js",
+      "fileHash": "aa8a0b82",
+      "needsInterop": false
+    },
+    "dayjs/plugin/relativeTime": {
+      "src": "../../node_modules/dayjs/plugin/relativeTime.js",
+      "file": "dayjs_plugin_relativeTime.js",
+      "fileHash": "3b6dde98",
+      "needsInterop": true
+    }
+  },
+  "chunks": {
+    "chunk-LER6W43O": {
+      "file": "chunk-LER6W43O.js"
+    },
+    "chunk-32E4H3EV": {
+      "file": "chunk-32E4H3EV.js"
+    },
+    "chunk-G3PMV62Z": {
+      "file": "chunk-G3PMV62Z.js"
+    }
+  }
+}
