@@ -86,8 +86,8 @@ const BookingModal = ({ provider, service, onClose }) => {
                 setIsSubmitting(false);
                 return;
             }
-            const taxes = service.basePrice * 0.18; // 18% tax example
-            const total = service.basePrice + taxes;
+            const taxes = parseFloat((service.basePrice * 0.18).toFixed(2));
+            const total = parseFloat((service.basePrice + taxes).toFixed(2));
 
             // 1. Create order
             const orderRes = await api.post('/payments/create-order', {
@@ -135,7 +135,9 @@ const BookingModal = ({ provider, service, onClose }) => {
                         onClose();
                         navigate('/dashboard');
                     } catch (err) {
-                        toast.error('Payment verification or booking failed');
+                        console.error('Payment/Booking Error:', err.response?.data || err);
+                        const errorMsg = err.response?.data?.message || err.message || 'Payment verification or booking failed';
+                        toast.error(errorMsg);
                         setIsSubmitting(false);
                     }
                 },
